@@ -1,1 +1,1 @@
-This serves as a template for creating a clean python module.
+An easy way to create and manage a `pip` Python package.

@@ -9,7 +9,8 @@
 ## INSTALLATION:
 
     $ pip install git+https://github.com/tchlux/packager.git
-%    $ pip install https://github.com/tchlux/template/archive/0.0.0.zip
+
+[//]: # $ pip install https://github.com/tchlux/template/archive/0.0.0.zip
 
 ## USAGE:
 
@@ -40,23 +41,14 @@
   directory, taking only the desired name to make necessary
   modifications to the internals of this project.
 
+  When creating a push to PyPI, the following steps are taken:
+  - The directory is cleaned of unnecessary files (.pyc, __pycache__)
+  - The `version_history.txt` file in the `about` directory is updated with the commit message.
+  - A `MANIFEST.in` file is created specifying all files in the repository, to ensure all files are included on install.
+  - Git commands `add *`, `commit -a`, and `push` are all executed.
+  - Git commands `tag -a <version> -m <notes>` and `push --tags <package` are executed.
+  - The `setup.py` file is executed with `sdist` argument to create a distribution.
+  - `twine` is used to upload the distribution to PyPI.
+  - All extra files created from the package build are deleted.
 
-## VERSION HISTORY:
-
-
-## UPCOMING
-
-- [x] Make this project even more usable.
-- [ ] Think more about this project.
-
-### Known Bugs
-
-- [ ] Find all the bugs.
-
-### Usability Issues
-
-- [ ] Make it all more usable.
-
-### Staged Improvements
-
-- [ ] Come up with improvements.
+[//]: # - [x] Make this project even more usable.
