@@ -63,6 +63,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=None,
     #   command -- A list of strings or string (space separated) describing
     #              a standard command as would be given to subprocess.Popen
     def run(command, **popen_kwargs):
+        print("  $", " ".join(command))
         # For Python3.x ensure that the outputs are strings
         if sys.version_info >= (3,6):
             popen_kwargs.update( dict(encoding="UTF-8") )
