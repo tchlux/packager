@@ -157,7 +157,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=None,
         # =========================================
         run(["git", "add", "*"])
         run(["git", "commit", "-a", "-m", notes])
-        run(["git", "push", package, "master"])
+        run(["git", "push", "origin", "master"])
 
     if git_release:
         #      Upload to github with version tag     
