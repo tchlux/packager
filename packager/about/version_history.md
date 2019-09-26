@@ -11,3 +11,4 @@
 | 1.0.4<br>September 2019 | Ready for usage again. |
 | 1.0.5<br>September 2019 | Modified trash handling. |
 | 1.0.6<br>September 2019 | Fixed some setup issues, including package, setup <br> script. |
+| 1.0.7<br>September 2019 | Fixed some typos. Stable release ready for use now. |
