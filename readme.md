@@ -41,7 +41,7 @@
 
   When creating a push to PyPI, the following steps are taken:
   - The directory is cleaned of unnecessary files (.pyc, __pycache__)
-  - The `version_history.txt` file in the `about` directory is updated with the commit message.
+  - The `version_history.md` file in the `about` directory is updated with the commit message.
   - A `MANIFEST.in` file is created specifying all files in the repository, to ensure all files are included on install.
   - Git commands `add *`, `commit -a`, and `push` are all executed.
   - Git commands `tag -a <version> -m <notes>` and `push --tags <package` are executed.

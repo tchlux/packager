@@ -20,9 +20,9 @@ def create(project):
         print(project_name, file=f)
 
 # Function for pushing an update of a package.
-def push(package_path, dry_run=False, clean_before=True, clean_after=None,
+def push(package_path, dry_run=False, clean_before=True, clean_after=True,
          manifest=True, manifest_exclude=(".git", ".gitignore"),
-         update_history=None, git_commit=None, git_release=None,
+         update_history=None, git_commit=False, git_release=None,
          pypi_build=None, pypi_release=None):
     import os, sys, datetime, subprocess
 
@@ -65,7 +65,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=None,
     #  INPUT:
     #   command -- A list of strings or string (space separated) describing
     #              a standard command as would be given to subprocess.Popen
-    def run(command, **popen_kwargs):
+    def run(command, display=True, **popen_kwargs):
         print("  $", " ".join(command))
         # For Python3.x ensure that the outputs are strings
         if sys.version_info >= (3,6):
@@ -80,16 +80,29 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=None,
         if stderr: stderr = stderr.replace("\r","").split("\n")
         else:      stderr = ""
         if (proc.returncode != 0) or (len(stderr) > 0):
-            raise(CommandError("\n\n%s"%("\n".join(stderr))))
-        elif (len(stdout) > 0):
+            raise(CommandError("\n\n"+("\n".join(stderr))))
+        elif (len(stdout) > 0) and display:
             print("\n".join(stdout))
+        # Return the stdout to be processed.
+        return stdout
+
+
+    # Check to see if there are files staged for commit first.
+    out = run(["git","status"], display=False)
+    if ("Changes to be committed" in "".join(out)):
+        print()
+        print("There are files staged for commit. Please commit before release.")
+        print()
+        exit()
+    print()
+    print("\n".join(out))
+    exit()
+
 
     # Infer the unprovided parameters based on whether or not this is
     # a dry run of the "push" operation.
     if (type(update_history) == type(None)):
         update_history = not dry_run
-    if (type(git_commit) == type(None)):
-        git_commit = not dry_run
     if (type(git_release) == type(None)):
         git_release = not dry_run
     if (type(pypi_build) == type(None)):
@@ -144,26 +157,29 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=None,
 
     # Generate an all-inclusive manifest
     if manifest:
-        with open(os.path.join(package_path,"MANIFEST.in"), "w") as f:
+        manifest_path = os.path.join(package_path,"MANIFEST.in")
+        with open(manifest_path, "w") as f:
             for name in os.listdir(package_path):
                 if name not in manifest_exclude:
                     if os.path.isdir(name):
                         print("recursive-include",name,"*", file=f)
                     else:
                         print("include",name, file=f)
+        run(["git", "add", manifest_path])
+        run(["git", "commit", "-m", "Added manifest for release."])
+        run(["git", "push"])
 
     if git_commit:
         #      Upload current version with git     
         # =========================================
-        run(["git", "add", "*"])
-        run(["git", "commit", "-a", "-m", notes])
-        run(["git", "push", "origin", "master"])
+        run(["git", "commit", "-m", notes])
+        run(["git", "push"])
 
     if git_release:
         #      Upload to github with version tag     
         # ===========================================
         run(["git", "tag", "-a", version, "-m", notes])
-        run(["git", "push", "--tags", "origin"])
+        run(["git", "push", "--tags"])
 
     if pypi_build:
         #      Setup the python package as a universal wheel     
@@ -184,7 +200,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=None,
     if clean_after:
         #      Remove all of the wheel generated files     
         # =================================================
-        run(["rm", "-rf", "dist", "build", package+".egg-info", "MANIFEST.in"])
+        run(["rm", "-rf", "dist", "build", package+".egg-info"])
 
     # Update the version file so the next will not conflict
     if not dry_run:
