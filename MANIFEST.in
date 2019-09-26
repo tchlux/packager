@@ -6,4 +6,3 @@ include package_name.txt
 recursive-include packager *
 include setup.cfg
 include LICENSE.txt
-recursive-include packager-trash *

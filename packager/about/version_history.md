@@ -8,3 +8,4 @@
 | 1.0.4<br>September 2019 | Removed version bug. |
 | 1.0.4<br>September 2019 | Removed version bug. |
 | 1.0.4<br>September 2019 | Removed version bug. |
+| 1.0.4<br>September 2019 | Ready for usage again. |
