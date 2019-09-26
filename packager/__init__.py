@@ -67,7 +67,8 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
     #   command -- A list of strings or string (space separated) describing
     #              a standard command as would be given to subprocess.Popen
     def run(command, display=False, error_okay=False, **popen_kwargs):
-        print("  $", " ".join(command))
+        print("  $", " ".join([c if (" " not in c) else '"'+c.replace('"','\\"')+'"'
+                               for c in command]))
         # For Python3.x ensure that the outputs are strings
         if sys.version_info >= (3,6):
             popen_kwargs.update( dict(encoding="UTF-8") )
@@ -82,7 +83,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
         else:      stderr = ""
         # Check for errors, print output if desired.
         if (not error_okay) and ((proc.returncode != 0) or (len(stderr) > 0)):
-            raise(CommandError("\n\n"+("\n".join(stderr))))
+            raise(CommandError(f"\nError code {proc.returncode}\n\n" +("\n".join(stderr))))
         elif (len(stdout) > 0) and display:
             print("\n".join(stdout))
         # Return the stdout to be processed.
