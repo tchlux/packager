@@ -2,6 +2,7 @@ recursive-include resources *
 include MANIFEST.in
 include readme.md
 include setup.py
+recursive-include packager_trash *
 include package_name.txt
 recursive-include packager *
 include setup.cfg
