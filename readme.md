@@ -1,6 +1,8 @@
 <p align="center">
   <h1 align="center">packager</h1>
-  <p align="center">An easy way to create and manage a `pip` Python package.</p>
+  <p align="center">
+  An easy way to create and manage a `pip` Python package.
+  </p>
 </p>
 
 
