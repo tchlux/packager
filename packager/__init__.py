@@ -177,7 +177,8 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
     # Remove all of the wheel generated files     
     if clean_after:
         run(["mkdir", "packager-trash"], error_okay=True)
-        run(["mv", "dist", "build", package+".egg-info", "packager-trash"])
+        run(["mv", "dist", "build", package+".egg-info",
+             "packager-trash"], error_okay=True)
 
     # Update the version file so the next will not conflict
     if not dry_run:
