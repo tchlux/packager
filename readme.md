@@ -6,6 +6,14 @@ An easy way to create and manage a `pip` Python package.
 
 ## INSTALLATION:
 
+  Install the latest stable release with:
+
+```bash
+pip install https://github.com/tchlux/packager/archive/1.0.5.zip
+```
+
+  In order to install the latest software (may be unstable) use:
+
 ```bash
 pip install git+https://github.com/tchlux/packager.git
 ```
