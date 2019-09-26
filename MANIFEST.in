@@ -1,4 +1,4 @@
-include resources
+recursive-include resources *
 include MANIFEST.in
 include readme.md
 include setup.py

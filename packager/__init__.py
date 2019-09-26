@@ -35,6 +35,9 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=None,
     if not os.path.exists(package_path):
         raise(MissingProject("No project exists at '"+package_path+"'."))
 
+    # Change directories into the package.
+    starting_dir = os.curdir
+    os.chdir(package_path)
     # Construct the name of the package and locate it's about directory.
     package = os.path.basename(package_path)
     package_about = os.path.join(package_path, package, "about")
@@ -189,3 +192,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=None,
         next_version[-1] += 1
         with open(os.path.join(package_about,"version.txt"), "w") as f:
             print(".".join(list(map(str,next_version))), file=f)
+
+
+    # Change directories back to the starting directory.
+    os.chdir(starting_dir)
