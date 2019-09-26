@@ -12,7 +12,7 @@ An easy way to create and manage a <code>pip</code> Python package.
   Install the latest stable release with:
 
 ```bash
-pip install https://github.com/tchlux/packager/archive/1.0.6.zip
+pip install https://github.com/tchlux/packager/archive/1.0.7.zip
 ```
 
   In order to install the current files in this repository
