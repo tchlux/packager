@@ -149,16 +149,12 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
         run(["git", "add", version_history_path])
         commit_message += "Updated version history. "
 
-    # Generate an all-inclusive manifest, add, commit, and push it.
+    # Make sure the manifest includes all contents of the package.
     if manifest:
         manifest_path = os.path.join(package_path,"MANIFEST.in")
         with open(manifest_path, "w") as f:
-            for name in os.listdir(package_path):
-                if name not in manifest_exclude:
-                    if os.path.isdir(name):
-                        print("recursive-include",name,"*", file=f)
-                    else:
-                        print("include",name, file=f)
+            print("recursive-include",package,"*", file=f)
+
         run(["git", "add", manifest_path])
         commit_message += "Updated package manifest. "
 
