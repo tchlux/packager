@@ -10,8 +10,6 @@
 
     $ pip install git+https://github.com/tchlux/packager.git
 
-[//]: # $ pip install https://github.com/tchlux/template/archive/0.0.0.zip
-
 ## USAGE:
 
 ### Python
@@ -50,5 +48,3 @@
   - The `setup.py` file is executed with `sdist` argument to create a distribution.
   - `twine` is used to upload the distribution to PyPI.
   - All extra files created from the package build are deleted.
-
-[//]: # - [x] Make this project even more usable.

@@ -163,7 +163,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=None,
         #      Upload to github with version tag     
         # ===========================================
         run(["git", "tag", "-a", version, "-m", notes])
-        run(["git", "push", "--tags", package])
+        run(["git", "push", "--tags", "origin"])
 
     if pypi_build:
         #      Setup the python package as a universal wheel     

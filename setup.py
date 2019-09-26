@@ -60,3 +60,11 @@ if __name__ == "__main__":
         license='MIT',
         classifiers=classifiers
     )
+
+
+# 
+# Install specific versions of a package with something like:
+# 
+#   pip install https://github.com/tchlux/packager/archive/1.0.0.zip
+# 
+# 
