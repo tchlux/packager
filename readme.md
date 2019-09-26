@@ -45,7 +45,7 @@ python -m packager <project> [create] [push] [push comments]
   If `create` is specified, a project is initialized with
   default files for a package managed by this module.
 
-  If `push` is specified, a git (and pypi if declared) update
+  If `push` is specified, a git (and PyPi if declared) update
   cycle is initiated. This includes a commit to the repository,
   version update, packaging, and commit to the PyPi servers.
 
@@ -55,12 +55,13 @@ python -m packager <project> [create] [push] [push comments]
   directory, taking only the desired name to make necessary
   modifications to the internals of this project.
 
-  When creating a push to PyPI, the following steps are taken:
-  - The directory is cleaned of unnecessary files (.pyc, __pycache__)
+  When creating a push to PyPi, the following steps are taken:
+  - The push is abandoned if there are staged files that require commit.
+  - The directory is cleaned of unnecessary files (`.pyc`, `__pycache__`)
   - The `version_history.md` file in the `about` directory is updated with the commit message.
   - A `MANIFEST.in` file is created specifying all files in the repository, to ensure all files are included on install.
-  - Git commands `add *`, `commit -a`, and `push` are all executed.
-  - Git commands `tag -a <version> -m <notes>` and `push --tags <package` are executed.
-  - The `setup.py` file is executed with `sdist` argument to create a distribution.
-  - `twine` is used to upload the distribution to PyPI.
+  - The `version_history.md` and `MANIFEST.in` files are added and committed.
+  - Git commands `tag -a <version> -m <notes>` and `push --tags` are executed.
+  - If PyPi, the `setup.py` file is executed with `sdist` argument to create a distribution.
+  - `twine` is used to upload the distribution to PyPi.
   - All extra files created from the package build are deleted.
