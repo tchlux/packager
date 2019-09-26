@@ -74,7 +74,8 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
             popen_kwargs.update( dict(encoding="UTF-8") )
         # Execute the command with a subprocess.
         proc = subprocess.Popen(command, cwd=package_path, stdin=subprocess.PIPE,
-                                stdout=subprocess.PIPE, **popen_kwargs)
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                **popen_kwargs)
         # Retrieve the standard output and errors.
         stdout, stderr = proc.communicate()
         if stdout: stdout = stdout.replace("\r","").split("\n")
@@ -82,7 +83,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
         if stderr: stderr = stderr.replace("\r","").split("\n")
         else:      stderr = ""
         # Check for errors, print output if desired.
-        if (not error_okay) and ((proc.returncode != 0) or (len(stderr) > 0)):
+        if (not error_okay) and (proc.returncode != 0):
             raise(CommandError(f"\nError code {proc.returncode}\n\n" +("\n".join(stderr))))
         elif (len(stdout) > 0) and display:
             print("\n".join(stdout))
@@ -121,6 +122,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
         else:
             raise(NotEnoughArguments("Provide update notes as command line argument."))
 
+    commit_message = ""
     # Update the version history stored in the 'about' folder.
     if update_history:
         max_comment_length = 52
@@ -145,9 +147,7 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
             print("| %s | %s |"%(time, formatted_comment), file=f)
 
         run(["git", "add", version_history_path])
-        run(["git", "commit", "-m", "Updated version history."])
-        run(["git", "push"])
-
+        commit_message += "Updated version history. "
 
     # Generate an all-inclusive manifest, add, commit, and push it.
     if manifest:
@@ -160,7 +160,11 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
                     else:
                         print("include",name, file=f)
         run(["git", "add", manifest_path])
-        run(["git", "commit", "-m", "Updated package manifest."])
+        commit_message += "Updated package manifest. "
+
+    # Commit the local changes that were made 
+    if (len(commit_message) > 0):
+        run(["git", "commit", "-m", commit_message.strip()])
         run(["git", "push"])
 
     # Upload to github with version tag
