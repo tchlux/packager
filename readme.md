@@ -1,28 +1,32 @@
-|             |                |
-|-------------|----------------|
-|**TITLE:**   | packager       |
-|**PURPOSE:** | An easy way to create and manage a `pip` Python package. |
-|**AUTHOR:**  | Thomas C.H. Lux  |
-|**EMAIL:**   | thomas.ch.lux@gmail.com |
+<p align="center">
+  <h1 align="center">packager</h1>
+</p>
 
+An easy way to create and manage a `pip` Python package.
 
 ## INSTALLATION:
 
-    $ pip install git+https://github.com/tchlux/packager.git
+```bash
+pip install git+https://github.com/tchlux/packager.git
+```
 
 ## USAGE:
 
 ### Python
 
-    > import packager  
-    > packager.create(<path_to_project>)
-    > packager.push(<path_to_project>)
+```python
+import packager  
+packager.create(<path_to_project>)
+packager.push(<path_to_project>)
+```
 
   Descriptions of the `create` and `push` functions follow.
 
 ### Command line
 
-    $ python -m packager <project> [create] [push] [push comments]
+```bash
+python -m packager <project> [create] [push] [push comments]
+```
 
   Manage a python package project at provided directory.
 
