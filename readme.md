@@ -1,8 +1,8 @@
 <p align="center">
   <h1 align="center">packager</h1>
+  <p align="center">An easy way to create and manage a `pip` Python package.</p>
 </p>
 
-An easy way to create and manage a `pip` Python package.
 
 ## INSTALLATION:
 
@@ -12,7 +12,8 @@ An easy way to create and manage a `pip` Python package.
 pip install https://github.com/tchlux/packager/archive/1.0.5.zip
 ```
 
-  In order to install the latest software (may be unstable) use:
+  In order to install the current files in this repository
+  (potentially less stable) use:
 
 ```bash
 pip install git+https://github.com/tchlux/packager.git
