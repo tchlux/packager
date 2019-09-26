@@ -22,10 +22,11 @@ def create(project):
 # Function for pushing an update of a package.
 def push(package_path, dry_run=False, clean_before=True, clean_after=True,
          manifest=True, manifest_exclude=(".git", ".gitignore"),
-         update_history=None, git_commit=False, git_release=None,
+         update_history=None, git_release=None,
          pypi_build=None, pypi_release=None):
     import os, sys, datetime, subprocess
 
+    class StagedCommit(Exception): pass
     class MissingAbout(Exception): pass
     class CommandError(Exception): pass
     class MissingProject(Exception): pass
@@ -65,39 +66,32 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
     #  INPUT:
     #   command -- A list of strings or string (space separated) describing
     #              a standard command as would be given to subprocess.Popen
-    def run(command, display=True, **popen_kwargs):
+    def run(command, display=False, error_okay=False, **popen_kwargs):
         print("  $", " ".join(command))
         # For Python3.x ensure that the outputs are strings
         if sys.version_info >= (3,6):
             popen_kwargs.update( dict(encoding="UTF-8") )
-        # print("'%s'"%(" ".join(command)))
-        # return
+        # Execute the command with a subprocess.
         proc = subprocess.Popen(command, cwd=package_path, stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, **popen_kwargs)
+        # Retrieve the standard output and errors.
         stdout, stderr = proc.communicate()
         if stdout: stdout = stdout.replace("\r","").split("\n")
         else:      stdout = ""
         if stderr: stderr = stderr.replace("\r","").split("\n")
         else:      stderr = ""
-        if (proc.returncode != 0) or (len(stderr) > 0):
+        # Check for errors, print output if desired.
+        if (not error_okay) and ((proc.returncode != 0) or (len(stderr) > 0)):
             raise(CommandError("\n\n"+("\n".join(stderr))))
         elif (len(stdout) > 0) and display:
             print("\n".join(stdout))
         # Return the stdout to be processed.
         return stdout
 
-
     # Check to see if there are files staged for commit first.
     out = run(["git","status"], display=False)
     if ("Changes to be committed" in "".join(out)):
-        print()
-        print("There are files staged for commit. Please commit before release.")
-        print()
-        exit()
-    print()
-    print("\n".join(out))
-    exit()
-
+        raise(StagedCommit("\n\nThere are files staged for commit. Please commit before release.\n\n"))
 
     # Infer the unprovided parameters based on whether or not this is
     # a dry run of the "push" operation.
@@ -114,26 +108,20 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
     version = read("version.txt")[0]
 
     if clean_before:
-        #      Remove all of the wheel generated files     
-        # =================================================
-        dist_dir = os.path.join(package_path,"dist")
-        build_dir = os.path.join(package_path, "build")
-        egg_file = os.path.join(package_path, )
-        run(["rm", "-rf", "dist", "build", package+".egg-info"])
         # Remove any pyc files that are hidden away     
         run(["find", ".", "-name", '*.pyc', "-delete"])
         run(["find", ".", "-name", '__pycache__', "-delete"])
 
-    if (update_history or git_commit or git_release):
+    # Make sure that enough arguments were provided for commit / release.
+    if (update_history or git_release):
         # Make sure the user provided the correct number of arguments
         if len(sys.argv) >= 2:
             notes = sys.argv[1]
         else:
             raise(NotEnoughArguments("Provide update notes as command line argument."))
 
+    # Update the version history stored in the 'about' folder.
     if update_history:
-        #     Update the history with the notes for this update     
-        # ==========================================================
         max_comment_length = 52
         formatted_comment = notes.split()
         start = 0
@@ -151,11 +139,16 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
         time = version +"<br>"+ month +" "+ year
 
         # Update the version history file
-        with open(os.path.join(package_about,"version_history.md"), "a") as f:
+        version_history_path = os.path.join(package_about,"version_history.md")
+        with open(version_history_path, "a") as f:
             print("| %s | %s |"%(time, formatted_comment), file=f)
 
+        run(["git", "add", version_history_path])
+        run(["git", "commit", "-m", "Updated version history."])
+        run(["git", "push"])
 
-    # Generate an all-inclusive manifest
+
+    # Generate an all-inclusive manifest, add, commit, and push it.
     if manifest:
         manifest_path = os.path.join(package_path,"MANIFEST.in")
         with open(manifest_path, "w") as f:
@@ -166,41 +159,25 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
                     else:
                         print("include",name, file=f)
         run(["git", "add", manifest_path])
-        run(["git", "commit", "-m", "Added manifest for release."])
+        run(["git", "commit", "-m", "Updated package manifest."])
         run(["git", "push"])
 
-    if git_commit:
-        #      Upload current version with git     
-        # =========================================
-        run(["git", "commit", "-m", notes])
-        run(["git", "push"])
-
+    # Upload to github with version tag
     if git_release:
-        #      Upload to github with version tag     
-        # ===========================================
         run(["git", "tag", "-a", version, "-m", notes])
         run(["git", "push", "--tags"])
 
-    if pypi_build:
-        #      Setup the python package as a universal wheel     
-        # =======================================================
-        run([sys.executable, "setup.py", "sdist"])
-        # run([sys.executable, "setup.py", "bdist_wheel"])
+    # Setup the python package as a standard distribution.
+    if pypi_build: run([sys.executable, "setup.py", "sdist"])
+    # if pypi_build: run([sys.executable, "setup.py", "bdist_wheel"])
 
-        #      Remove any pyc files that are hidden away     
-        # ===================================================
-        run(["find", ".", "-name", '*.pyc', "-delete"])
-        run(["find", ".", "-name", '__pycache__', "-delete"])
+    # Use twine to upload the package to PyPi
+    if pypi_release: run(["twine", "upload", "dist/*"], display=True)
 
-    if pypi_release:
-        #      Use twine to upload the package to PyPI     
-        # =================================================
-        run(["twine", "upload", "dist/*"])
-
+    # Remove all of the wheel generated files     
     if clean_after:
-        #      Remove all of the wheel generated files     
-        # =================================================
-        run(["rm", "-rf", "dist", "build", package+".egg-info"])
+        run(["mkdir", "packager-trash"], error_okay=True)
+        run(["mv", "dist", "build", package+".egg-info", "packager-trash"])
 
     # Update the version file so the next will not conflict
     if not dry_run:
@@ -208,7 +185,6 @@ def push(package_path, dry_run=False, clean_before=True, clean_after=True,
         next_version[-1] += 1
         with open(os.path.join(package_about,"version.txt"), "w") as f:
             print(".".join(list(map(str,next_version))), file=f)
-
 
     # Change directories back to the starting directory.
     os.chdir(starting_dir)
