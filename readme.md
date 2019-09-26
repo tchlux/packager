@@ -2,7 +2,9 @@
   <h1 align="center">packager</h1>
 </p>
 
-An easy way to create and manage a `pip` Python package.
+<p align="center">
+An easy way to create and manage a <code>pip</code> Python package.
+</p>
 
 
 ## INSTALLATION:
