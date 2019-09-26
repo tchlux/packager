@@ -1,5 +1,5 @@
 *.pyc
 *.so
 __pycache__
-packager-trash
+trash-package
 .DS_Store
