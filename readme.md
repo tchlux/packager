@@ -16,8 +16,8 @@ pip install git+https://github.com/tchlux/packager.git
 
 ```python
 import packager  
-packager.create(<path_to_project>)
-packager.push(<path_to_project>)
+packager.create("path_to_project")
+packager.push("path_to_project")
 ```
 
   Descriptions of the `create` and `push` functions follow.
