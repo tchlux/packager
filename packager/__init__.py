@@ -3,8 +3,14 @@ import os
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 ABOUT_DIR = os.path.join(DIRECTORY, "about")
-__version__ = open(os.path.join(ABOUT_DIR,"version.txt")).read().strip()
+with open(os.path.join(ABOUT_DIR,"version.txt")) as f:
+    __version__ = f.read().strip()
 
+
+# TODO: Create a `doc` option that updates / creates documentation for
+#       code (follow the `util` example for formatting).
+# TODO: Create a `test` option that executes all tests in a module
+#       using some unified testing framework.
 
 # Function for creating a project.
 def create(project):
